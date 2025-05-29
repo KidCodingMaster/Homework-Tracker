@@ -1,4 +1,4 @@
 {
-    "usernameFile": "usernames.db"
-    
+    "usernameFile": "usernames.db",
+    "studentsFile": "students.db"
 }
