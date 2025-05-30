@@ -35,6 +35,52 @@ class Teacher:
                         print(db[kid]["tasks"])
 
                 print("Task added successfully!")
+            elif cmd == "2":
+                with shelve.open(settings["studentsFile"]) as db:
+                    tasks = db[list(db.keys())[0]]["tasks"]
+
+                if tasks:
+                    print("Tasks: ")
+
+                    for num, i in enumerate(tasks):
+                        print(f"{num + 1}. {i}")
+                else:
+                    print("No tasks added!")
+
+                print()
+            elif cmd == "3":
+                name = input("Who's name do you want to check progress of? ")
+
+                with shelve.open(settings["studentsFile"]) as db:
+                    if name not in db.keys():
+                        print("Name not found!")
+                        continue
+
+                    with shelve.open(settings["studentsFile"]) as db:
+                        completed = db[list(db.keys())[0]]["completed"]
+                        tasks = db[list(db.keys())[0]]["tasks"]
+
+                    if completed:
+                        print("Completed Tasks: ")
+
+                        for num, i in enumerate(completed):
+                            print(f"{num + 1}. {i}")
+                    else:
+                        print("No tasks completed!")
+
+                    print()
+
+                    incomplete = set(completed).difference(set(tasks))
+
+                    if incomplete == set():
+                        print("No Incomplete Tasks!")
+                    else:
+                        print("Incomplete Tasks: ")
+
+                        for num, i in enumerate(incomplete):
+                            print(f"{num + 1}. {i}")
+
+                        print()
             elif cmd == "4":
                 print("Good Bye!")
 
@@ -50,11 +96,25 @@ class Student:
 
         while True:
             print("1. View tasks")
-            print("2. Logout")
+            print("2. Complete Task")
+            print("3. Logout")
 
             cmd = input("What do you want to do? ")
 
             if cmd == "1":
+                with shelve.open(settings["studentsFile"]) as db:
+                    tasks = db[self.name]["tasks"]
+
+                if tasks:
+                    print("Tasks: ")
+
+                    for num, i in enumerate(tasks):
+                        print(f"{num + 1}. {i}")
+                else:
+                    print("No tasks added!")
+
+                print()
+            elif cmd == "4":
                 print("Tasks: ")
 
                 with shelve.open(settings["studentsFile"]) as db:
@@ -64,7 +124,26 @@ class Student:
                     print(f"{num + 1}. {i}")
 
                 print()
-            elif cmd == "2":
+
+                task = input("Which task do you want to complete? ")
+
+                if not task.isdigit():
+                    print("Please enter a numerical value!")
+                    continue
+
+                task_idx = int(task)
+
+                if task > len(tasks) or task < 1:
+                    print("Please enter a valid input!")
+                    continue
+
+                with shelve.open(settings["studentsFile"]) as db:
+                    completed = db[self.name]["completed"]
+                    completed.append(tasks[task_idx - 1])
+                    db[self.name]["completed"] = completed
+
+                    print("Task is completed!")
+            elif cmd == "3":
                 print("Good Bye!")
 
                 return
@@ -104,9 +183,12 @@ def signup(username, person_type):
 
         with shelve.open(settings["studentsFile"]) as db:
             if len(db.keys()) > 0:
-                db[username] = {"tasks": db[list(db.keys())[0]]["tasks"]}
+                db[username] = {
+                    "tasks": db[list(db.keys())[0]]["tasks"],
+                    "completed": [],
+                }
             else:
-                db[username] = {"tasks": []}
+                db[username] = {"tasks": [], "completed": []}
 
     person.run()
 
