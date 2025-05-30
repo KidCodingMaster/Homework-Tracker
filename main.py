@@ -103,7 +103,10 @@ def signup(username, person_type):
         person = Student(username)
 
         with shelve.open(settings["studentsFile"]) as db:
-            db[username] = {"tasks": []}
+            if len(db.keys()) > 0:
+                db[username] = {"tasks": db[list(db.keys())[0]]["tasks"]}
+            else:
+                db[username] = {"tasks": []}
 
     person.run()
 
@@ -125,7 +128,7 @@ def login(username, password, person_type):
                 person.run()
             elif db[username]["password"] != password:
                 print("Incorrect password!")
-            elif db[username]["type"] != password:
+            elif db[username]["type"] != person_type:
                 print("Incorrect type!")
         else:
             print("Username not found!")
