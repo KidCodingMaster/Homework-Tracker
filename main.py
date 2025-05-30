@@ -16,6 +16,30 @@ class Teacher:
     def run(self):
         print("You are logged in as a teacher")
 
+        while True:
+            print("1. Add task")
+            print("2. View Tasks")
+            print("3. View progress")
+            print("4. Logout")
+
+            cmd = input("\nWhat do you want to do? ")
+
+            if cmd == "1":
+                name = input("What is the task? ")
+
+                with shelve.open(settings["studentsFile"]) as db:
+                    for kid in db.keys():
+                        student_data = db[kid]
+                        student_data["tasks"].append(name)
+                        db[kid] = student_data
+                        print(db[kid]["tasks"])
+
+                print("Task added successfully!")
+            elif cmd == "4":
+                print("Good Bye!")
+
+                return
+
 
 class Student:
     def __init__(self, name):
@@ -23,6 +47,27 @@ class Student:
 
     def run(self):
         print("You are logged in as a student")
+
+        while True:
+            print("1. View tasks")
+            print("2. Logout")
+
+            cmd = input("What do you want to do? ")
+
+            if cmd == "1":
+                print("Tasks: ")
+
+                with shelve.open(settings["studentsFile"]) as db:
+                    tasks = db[self.name]["tasks"]
+
+                for num, i in enumerate(tasks):
+                    print(f"{num + 1}. {i}")
+
+                print()
+            elif cmd == "2":
+                print("Good Bye!")
+
+                return
 
 
 def generate_password():
